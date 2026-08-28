@@ -336,7 +336,7 @@
 
 <div id="app">
   <header>
-    <p class="eyebrow">North East Folklore Society</p>
+    <p class="eyebrow">North East Folklore Society:</p>
     <h1>Folklore, Churches &amp; Ancient Sites</h1>
     <div class="filters" id="filters"></div>
   </header>
@@ -358,8 +358,8 @@
       <label>Category</label>
       <select id="f-category">
         <option value="Folklore site">Folklore site</option>
-<option value="Church">Church</option>
-<option value="Ancient site">Ancient site</option>
+        <option value="Church">Church</option>
+        <option value="Ancient site">Ancient site</option>
       </select>
 
       <label>Description &amp; source</label>
@@ -398,6 +398,7 @@ const CATEGORY = {
   'Church':        { label: 'Church',        color: '#A6631B', emoji: '⛪' },
   'Ancient site':  { label: 'Ancient site',  color: '#5C6B4C', emoji: '🌀' }
 };
+
 // Site data now lives in Airtable, not here. See the note below for adding
 // your first six sites through the Airtable interface.
 const SEED_SITES = [];
