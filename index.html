@@ -358,8 +358,8 @@
       <label>Category</label>
       <select id="f-category">
         <option value="folklore">Folklore site</option>
-        <option value="church">Ancient church</option>
-        <option value="neolithic">Neolithic site</option>
+        <option value="church">Church</option>
+        <option value="ancient">Ancient site</option>
       </select>
 
       <label>Description &amp; source</label>
@@ -394,9 +394,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 const CATEGORY = {
-  folklore:  { label: 'Folklore site',  color: '#3C3489', emoji: '📖' },
-  church:    { label: 'Ancient church', color: '#A6631B', emoji: '⛪' },
-  neolithic: { label: 'Neolithic site', color: '#5C6B4C', emoji: '🌀' }
+  folklore: { label: 'Folklore site', color: '#3C3489', emoji: '📖' },
+  church:   { label: 'Church',        color: '#A6631B', emoji: '⛪' },
+  ancient:  { label: 'Ancient site',  color: '#5C6B4C', emoji: '🌀' }
 };
 
 // Site data now lives in Airtable, not here. See the note below for adding
