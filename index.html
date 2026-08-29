@@ -287,6 +287,7 @@
     display: flex;
     gap: 10px;
     margin-top: 22px;
+    margin-bottom: 40px;
   }
   .btn-primary, .btn-ghost {
     flex: 1;
@@ -505,11 +506,15 @@ async function saveSubmissions(newSite) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSite)
     });
-    if (!res.ok) throw new Error('Save failed');
-    return true;
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('Could not save submission', text);
+      return { ok: false, detail: text };
+    }
+    return { ok: true };
   } catch (e) {
     console.error('Could not save submission', e);
-    return false;
+    return { ok: false, detail: e.message };
   }
 }
 
@@ -662,9 +667,9 @@ submitForm.addEventListener('submit', async (e) => {
     lng: pickedLatLng.lng
   };
 
-  const ok = await saveSubmissions(site);
-  if (!ok) {
-    showToast('Could not save, check your connection and try again');
+  const result = await saveSubmissions(site);
+  if (!result.ok) {
+    showToast('Could not save: ' + (result.detail ? result.detail.slice(0, 120) : 'unknown error'));
     return;
   }
   await loadSubmissions();
