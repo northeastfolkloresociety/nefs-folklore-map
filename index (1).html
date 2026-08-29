@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>North East Folklore Map: prototype</title>
+<title>North East Folklore Map: </title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
     align-items: center;
     gap: 6px;
     background: var(--ink);
-    color: var(--parchment);
+    color: #fff !important;
     text-decoration: none;
     font-family: 'Cardo', serif;
     font-size: 12px;
@@ -182,7 +182,7 @@
     max-height: 88vh;
     overflow-y: auto;
     border-radius: 14px 14px 0 0;
-    padding: 20px 20px 26px;
+    padding: 20px 20px 70px;
     border-top: 1px solid var(--line);
   }
   @media (min-width: 640px) {
@@ -287,7 +287,6 @@
     display: flex;
     gap: 10px;
     margin-top: 22px;
-    margin-bottom: 40px;
   }
   .btn-primary, .btn-ghost {
     flex: 1;
@@ -337,7 +336,7 @@
 
 <div id="app">
   <header>
-    <p class="eyebrow">North East Folklore Society: prototype</p>
+    <p class="eyebrow">North East Folklore Society:</p>
     <h1>Folklore, Churches &amp; Ancient Sites</h1>
     <div class="filters" id="filters"></div>
   </header>
