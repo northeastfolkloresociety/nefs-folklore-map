@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>North East Folklore Map</title>
+<title>North East Folklore Map:</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
     align-items: center;
     gap: 6px;
     background: var(--ink);
-    color: var(--parchment);
+    color: #fff !important;
     text-decoration: none;
     font-family: 'Cardo', serif;
     font-size: 12px;
@@ -182,7 +182,7 @@
     max-height: 88vh;
     overflow-y: auto;
     border-radius: 14px 14px 0 0;
-    padding: 20px 20px 26px;
+    padding: 20px 20px 70px;
     border-top: 1px solid var(--line);
   }
   @media (min-width: 640px) {
@@ -287,7 +287,6 @@
     display: flex;
     gap: 10px;
     margin-top: 22px;
-    margin-bottom: 40px;
   }
   .btn-primary, .btn-ghost {
     flex: 1;
@@ -456,230 +455,4 @@ function renderMarkers() {
   markers = [];
   const all = [...SEED_SITES, ...userSubmissions];
   all.forEach(site => {
-    if (activeCategory !== 'all' && site.category !== activeCategory) return;
-    const marker = L.marker([site.lat, site.lng], { icon: makeIcon(site.category, site.approved) })
-      .addTo(map)
-      .bindPopup(popupHtml(site));
-    markers.push(marker);
-  });
-}
-
-function renderFilters() {
-  const container = document.getElementById('filters');
-  const all = [{ key: 'all', label: 'All sites', emoji: '🗺️' }]
-    .concat(Object.keys(CATEGORY).map(k => ({ key: k, label: CATEGORY[k].label, emoji: CATEGORY[k].emoji })));
-
-  container.innerHTML = '';
-  all.forEach(c => {
-    const chip = document.createElement('button');
-    chip.className = 'chip' + (activeCategory === c.key ? ' active' : '');
-    chip.innerHTML = `<span class="chip-emoji">${c.emoji}</span>${c.label}`;
-    chip.onclick = () => { activeCategory = c.key; renderFilters(); renderMarkers(); };
-    container.appendChild(chip);
-  });
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
-}
-
-// Loading sites from Airtable, via the Netlify function so the token stays private
-async function loadSubmissions() {
-  try {
-    const res = await fetch('/.netlify/functions/sites');
-    const data = await res.json();
-    userSubmissions = Array.isArray(data) ? data : [];
-  } catch (e) {
-    userSubmissions = [];
-    showToast('Could not load sites, check your connection');
-  }
-  renderMarkers();
-}
-
-async function saveSubmissions(newSite) {
-  try {
-    const res = await fetch('/.netlify/functions/sites', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newSite)
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      console.error('Could not save submission', text);
-      return { ok: false, detail: text };
-    }
-    return { ok: true };
-  } catch (e) {
-    console.error('Could not save submission', e);
-    return { ok: false, detail: e.message };
-  }
-}
-
-// Modal controls
-const overlay = document.getElementById('overlay');
-const addBtn = document.getElementById('addBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const pickLocationBtn = document.getElementById('pickLocationBtn');
-const coordReadout = document.getElementById('coordReadout');
-const submitForm = document.getElementById('submitForm');
-const searchInput = document.getElementById('f-search');
-const searchResults = document.getElementById('searchResults');
-
-let searchTimeout = null;
-let previewMarker = null;
-
-addBtn.onclick = () => {
-  overlay.classList.add('open');
-};
-cancelBtn.onclick = closeModal;
-overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-
-function clearPreviewMarker() {
-  if (previewMarker) { map.removeLayer(previewMarker); previewMarker = null; }
-}
-
-function closeModal() {
-  overlay.classList.remove('open');
-  pickingLocation = false;
-  pickedLatLng = null;
-  pickLocationBtn.classList.remove('picking');
-  pickLocationBtn.textContent = 'Tap the map instead';
-  coordReadout.textContent = 'Not set yet';
-  coordReadout.style.color = '';
-  searchInput.value = '';
-  searchResults.innerHTML = '';
-  searchResults.classList.remove('open');
-  clearPreviewMarker();
-  submitForm.reset();
-}
-
-// Search for a place using OpenStreetMap's free geocoder, biased to the North East
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const q = searchInput.value.trim();
-  if (q.length < 3) {
-    searchResults.innerHTML = '';
-    searchResults.classList.remove('open');
-    return;
-  }
-  searchTimeout = setTimeout(() => runPlaceSearch(q), 400);
-});
-
-const MAPBOX_TOKEN = 'pk.eyJ1Ijoibm9ydGhlYXN0Zm9sa2xvcmVzb2NpZXR5IiwiYSI6ImNtdGQzZXp3djByOWsyd3NhZzR5am93dTYifQ.1ytNz04Vic68EqY5d4_Kig';
-
-async function runPlaceSearch(q) {
-  try {
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&bbox=-2.6,54.4,-1.1,55.9&limit=6`;
-    const res = await fetch(url);
-    const data = await res.json();
-    renderSearchResults(data.features || []);
-  } catch (e) {
-    searchResults.innerHTML = '<div class="search-empty">Search unavailable right now, try tapping the map instead</div>';
-    searchResults.classList.add('open');
-  }
-}
-
-function renderSearchResults(results) {
-  if (!results || !results.length) {
-    searchResults.innerHTML = '<div class="search-empty">No matches, try tapping the map instead</div>';
-    searchResults.classList.add('open');
-    return;
-  }
-  searchResults.innerHTML = '';
-  results.forEach(r => {
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'search-item';
-    item.textContent = r.place_name;
-    item.onclick = () => selectSearchResult(r);
-    searchResults.appendChild(item);
-  });
-  searchResults.classList.add('open');
-}
-
-function selectSearchResult(r) {
-  const lng = r.center[0];
-  const lat = r.center[1];
-  pickedLatLng = { lat, lng };
-  coordReadout.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-  coordReadout.style.color = '';
-  searchInput.value = r.place_name;
-  searchResults.innerHTML = '';
-  searchResults.classList.remove('open');
-  map.setView([lat, lng], 15);
-  clearPreviewMarker();
-  previewMarker = L.marker([lat, lng], { opacity: 0.75 }).addTo(map);
-}
-
-pickLocationBtn.onclick = () => {
-  pickingLocation = true;
-  pickLocationBtn.classList.add('picking');
-  pickLocationBtn.textContent = 'Now tap the map…';
-  overlay.classList.remove('open'); // let them see the map
-  showToast('Tap anywhere on the map to place your pin');
-};
-
-map.on('click', (e) => {
-  if (!pickingLocation) return;
-  pickedLatLng = e.latlng;
-  coordReadout.textContent = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
-  coordReadout.style.color = '';
-  searchInput.value = '';
-  pickLocationBtn.classList.remove('picking');
-  pickLocationBtn.textContent = 'Tap the map instead';
-  pickingLocation = false;
-  overlay.classList.add('open');
-  clearPreviewMarker();
-  previewMarker = L.marker(e.latlng, { opacity: 0.75 }).addTo(map);
-});
-
-submitForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById('f-name').value.trim();
-  const desc = document.getElementById('f-desc').value.trim();
-
-  if (!name) {
-    showToast('Give the site a name first');
-    document.getElementById('f-name').focus();
-    return;
-  }
-  if (!desc) {
-    showToast('Add a description or source');
-    document.getElementById('f-desc').focus();
-    return;
-  }
-  if (!pickedLatLng) {
-    showToast('Tap "Tap map to place pin" and choose a spot first');
-    coordReadout.style.color = '#b23b3b';
-    return;
-  }
-
-  const site = {
-    category: document.getElementById('f-category').value,
-    name: name,
-    desc: desc,
-    submitter: document.getElementById('f-submitter').value.trim(),
-    lat: pickedLatLng.lat,
-    lng: pickedLatLng.lng
-  };
-
-  const result = await saveSubmissions(site);
-  if (!result.ok) {
-    showToast('Could not save: ' + (result.detail ? result.detail.slice(0, 120) : 'unknown error'));
-    return;
-  }
-  await loadSubmissions();
-  closeModal();
-  showToast('Thanks, sent for review');
-});
-
-renderFilters();
-loadSubmissions();
-</script>
-
-</body>
-</html>
+    if (activeCategory !==
