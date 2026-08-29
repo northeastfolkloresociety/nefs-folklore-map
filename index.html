@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>North East Folklore Map: prototype</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -183,7 +183,7 @@
     max-height: 88dvh;
     overflow-y: auto;
     border-radius: 14px 14px 0 0;
-    padding: 20px 20px 24px;
+    padding: 20px 20px 0;
     border-top: 1px solid var(--line);
   }
   @media (min-width: 640px) {
@@ -288,9 +288,9 @@
     display: flex;
     gap: 10px;
     margin: 22px -20px 0;
-    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
     position: sticky;
-    bottom: -24px;
+    bottom: 0;
     background: var(--parchment);
     border-top: 1px solid var(--line);
   }
