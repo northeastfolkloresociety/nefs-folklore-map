@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>North East Folklore Map:</title>
+<title>North East Folklore Map</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Petrona:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     --parchment: #F5F0E8;
@@ -26,7 +26,7 @@
     margin: 0; padding: 0; height: 100%;
     background: var(--parchment);
     color: var(--ink);
-    font-family: 'Spectral', Georgia, serif;
+    font-family: 'Petrona', Georgia, serif;
   }
 
   #app { display: flex; flex-direction: column; height: 100vh; }
@@ -40,7 +40,7 @@
   }
 
   .eyebrow {
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -49,7 +49,7 @@
   }
 
   h1 {
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-weight: 700;
     font-size: 22px;
     margin: 0 0 10px;
@@ -65,7 +65,7 @@
 
   .chip {
     flex: none;
-    font-family: 'Spectral', serif;
+    font-family: 'Petrona', serif;
     font-size: 13px;
     border: 1px solid var(--line);
     background: #fff;
@@ -91,7 +91,7 @@
     background: var(--purple);
     color: #fff;
     border: none;
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-weight: 700;
     font-size: 14px;
     letter-spacing: 0.02em;
@@ -112,16 +112,16 @@
     box-shadow: 0 6px 20px rgba(44,44,42,0.22);
   }
   .leaflet-popup-tip { background: var(--parchment); }
-  .leaflet-popup-content { margin: 14px 16px; font-family: 'Spectral', serif; }
+  .leaflet-popup-content { margin: 14px 16px; font-family: 'Petrona', serif; }
   .popup-cat {
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     margin-bottom: 4px;
     display: inline-block;
   }
-  .popup-title { font-family: 'Cardo', serif; font-weight: 700; font-size: 16px; margin: 0 0 6px; }
+  .popup-title { font-family: 'Petrona', serif; font-weight: 700; font-size: 16px; margin: 0 0 6px; }
   .popup-desc { font-size: 13px; line-height: 1.5; color: var(--ink-soft); margin: 0 0 10px; }
   .popup-pending {
     display: inline-block;
@@ -142,7 +142,7 @@
     background: var(--ink);
     color: #fff !important;
     text-decoration: none;
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 12px;
     letter-spacing: 0.03em;
     padding: 8px 12px;
@@ -191,7 +191,7 @@
   }
 
   .sheet h2 {
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 19px;
     margin: 0 0 4px;
   }
@@ -203,7 +203,7 @@
 
   label {
     display: block;
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 12px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -212,7 +212,7 @@
   }
   input[type=text], textarea, select {
     width: 100%;
-    font-family: 'Spectral', serif;
+    font-family: 'Petrona', serif;
     font-size: 15px;
     background: #fff;
     border: 1px solid var(--line);
@@ -238,7 +238,7 @@
     display: block;
     width: 100%;
     text-align: left;
-    font-family: 'Spectral', serif;
+    font-family: 'Petrona', serif;
     font-size: 13px;
     line-height: 1.4;
     background: none;
@@ -272,7 +272,7 @@
     margin-top: 6px;
   }
   .locate-btn {
-    font-family: 'Spectral', serif;
+    font-family: 'Petrona', serif;
     font-size: 13px;
     background: #fff;
     border: 1px solid var(--line);
@@ -296,7 +296,7 @@
   }
   .btn-primary, .btn-ghost {
     flex: 1;
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-weight: 700;
     font-size: 14px;
     padding: 12px;
@@ -325,7 +325,7 @@
     transform: translateX(-50%) translateY(20px);
     background: var(--ink);
     color: var(--parchment);
-    font-family: 'Cardo', serif;
+    font-family: 'Petrona', serif;
     font-size: 13px;
     padding: 11px 18px;
     border-radius: 999px;
@@ -342,7 +342,7 @@
 
 <div id="app">
   <header>
-    <p class="eyebrow">North East Folklore Society:</p>
+    <p class="eyebrow">North East Folklore Society</p>
     <h1>Folklore, Churches &amp; Ancient Sites</h1>
     <div class="filters" id="filters"></div>
   </header>
@@ -575,12 +575,34 @@ searchInput.addEventListener('input', () => {
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoibm9ydGhlYXN0Zm9sa2xvcmVzb2NpZXR5IiwiYSI6ImNtdGQzZXp3djByOWsyd3NhZzR5am93dTYifQ.1ytNz04Vic68EqY5d4_Kig';
 
+// Nominatim (OpenStreetMap's own search) has much better coverage of small
+// villages, hamlets and named landmarks than commercial place-search APIs,
+// which is exactly what folklore sites tend to be. It's biased towards the
+// North East but not restricted to it, so a match just outside the region
+// still comes back rather than being silently dropped. If it comes back
+// empty, we fall back to Mapbox's search as a second attempt before giving up.
 async function runPlaceSearch(q) {
   try {
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&bbox=-2.6,54.4,-1.1,55.9&limit=6`;
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&countrycodes=gb&viewbox=-2.6,55.9,-1.1,54.4&bounded=0&limit=8`;
     const res = await fetch(url);
     const data = await res.json();
-    renderSearchResults(data.features || []);
+    if (data && data.length) {
+      renderSearchResults(data.map(r => ({ label: r.display_name, lat: parseFloat(r.lat), lng: parseFloat(r.lon) })));
+      return;
+    }
+    await runMapboxFallback(q);
+  } catch (e) {
+    await runMapboxFallback(q);
+  }
+}
+
+async function runMapboxFallback(q) {
+  try {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&bbox=-2.6,54.4,-1.1,55.9&limit=8`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = (data.features || []).map(f => ({ label: f.place_name, lat: f.center[1], lng: f.center[0] }));
+    renderSearchResults(results);
   } catch (e) {
     searchResults.innerHTML = '<div class="search-empty">Search unavailable right now, try tapping the map instead</div>';
     searchResults.classList.add('open');
@@ -598,7 +620,7 @@ function renderSearchResults(results) {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'search-item';
-    item.textContent = r.place_name;
+    item.textContent = r.label;
     item.onclick = () => selectSearchResult(r);
     searchResults.appendChild(item);
   });
@@ -606,12 +628,12 @@ function renderSearchResults(results) {
 }
 
 function selectSearchResult(r) {
-  const lng = r.center[0];
-  const lat = r.center[1];
+  const lat = r.lat;
+  const lng = r.lng;
   pickedLatLng = { lat, lng };
   coordReadout.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   coordReadout.style.color = '';
-  searchInput.value = r.place_name;
+  searchInput.value = r.label;
   searchResults.innerHTML = '';
   searchResults.classList.remove('open');
   map.setView([lat, lng], 15);
