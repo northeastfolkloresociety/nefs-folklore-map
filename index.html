@@ -123,6 +123,16 @@
   }
   .popup-title { font-family: 'Petrona', serif; font-weight: 700; font-size: 16px; margin: 0 0 6px; }
   .popup-desc { font-size: 13px; line-height: 1.5; color: var(--ink-soft); margin: 0 0 10px; }
+  .popup-access {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--parchment-deep);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px 9px;
+    margin: 0 0 10px;
+  }
   .popup-pending {
     display: inline-block;
     font-size: 10px;
@@ -147,6 +157,31 @@
     letter-spacing: 0.03em;
     padding: 8px 12px;
     border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+  }
+  .popup-btn-ghost {
+    background: transparent;
+    color: var(--ink) !important;
+    border: 1px solid var(--line);
+  }
+  .popup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .popup-gallery {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin: 0 0 10px;
+  }
+  .popup-gallery img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    flex: none;
   }
 
   .marker-pin {
@@ -382,6 +417,9 @@
         <span class="coord-readout" id="coordReadout">Not set yet</span>
       </div>
 
+      <label>Accessibility information (optional)</label>
+      <textarea id="f-accessibility" placeholder="e.g. gravel path, some steps, roadside parking nearby"></textarea>
+
       <label>Your name (optional)</label>
       <input type="text" id="f-submitter" placeholder="So we can credit you">
 
@@ -389,6 +427,28 @@
 
       <div class="sheet-actions">
         <button type="button" class="btn-ghost" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn-primary">Submit for review</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="photoOverlay">
+  <div class="sheet">
+    <h2>Add a photo</h2>
+    <p class="sub" id="photoSiteName"></p>
+
+    <form id="photoForm">
+      <label>Photo</label>
+      <input type="file" id="f-photo" accept="image/*" capture="environment">
+
+      <label>Your name (optional)</label>
+      <input type="text" id="f-photo-submitter" placeholder="So we can credit you">
+
+      <div class="note">Photos are reviewed by the North East Folklore Society before they appear on the map for everyone.</div>
+
+      <div class="sheet-actions">
+        <button type="button" class="btn-ghost" id="photoCancelBtn">Cancel</button>
         <button type="submit" class="btn-primary">Submit for review</button>
       </div>
     </form>
@@ -414,6 +474,7 @@ let pickingLocation = false;
 let pickedLatLng = null;
 let userSubmissions = [];
 let markers = [];
+let sitePhotos = {};
 
 const map = L.map('map', { zoomControl: true }).setView([55.15, -1.85], 8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -440,13 +501,25 @@ function directionsUrl(lat, lng) {
 function popupHtml(site) {
   const cat = CATEGORY[site.category] || { label: site.category, color: '#2C2C2A' };
   const pendingBadge = site.approved ? '' : '<div class="popup-pending">Pending review</div>';
+  const photos = (site.id && sitePhotos[site.id]) || [];
+  const gallery = photos.length
+    ? `<div class="popup-gallery">${photos.map(url => `<img src="${url}" alt="Visitor photo of ${escapeHtml(site.name)}">`).join('')}</div>`
+    : '';
+  const addPhotoBtn = site.id
+    ? `<button type="button" class="popup-btn popup-btn-ghost" onclick="openPhotoModal('${site.id}', '${escapeHtml(site.name).replace(/'/g, "&#39;")}')">Add a photo</button>`
+    : '';
   return `
     <span class="popup-cat" style="color:${cat.color}">${cat.label}</span>
     ${pendingBadge}
     <p class="popup-title">${escapeHtml(site.name)}</p>
     <p class="popup-desc">${escapeHtml(site.desc)}</p>
+    ${site.accessibility ? `<p class="popup-access"><strong>Access:</strong> ${escapeHtml(site.accessibility)}</p>` : ''}
     ${site.submitter ? `<p class="popup-desc" style="margin-top:-6px;font-style:italic;">Suggested by ${escapeHtml(site.submitter)}</p>` : ''}
-    <a class="popup-btn" href="${directionsUrl(site.lat, site.lng)}" target="_blank" rel="noopener">Get directions →</a>
+    ${gallery}
+    <div class="popup-actions">
+      <a class="popup-btn" href="${directionsUrl(site.lat, site.lng)}" target="_blank" rel="noopener">Get directions →</a>
+      ${addPhotoBtn}
+    </div>
   `;
 }
 
@@ -522,6 +595,113 @@ async function saveSubmissions(newSite) {
     return { ok: false, detail: e.message };
   }
 }
+
+// Loading approved visitor photos from Airtable, via the Netlify function
+async function loadPhotos() {
+  try {
+    const res = await fetch('/.netlify/functions/photos');
+    const data = await res.json();
+    const bySite = {};
+    (Array.isArray(data) ? data : []).forEach(p => {
+      if (!p.siteId || !p.url) return;
+      if (!bySite[p.siteId]) bySite[p.siteId] = [];
+      bySite[p.siteId].push(p.url);
+    });
+    sitePhotos = bySite;
+  } catch (e) {
+    sitePhotos = {};
+  }
+  renderMarkers();
+}
+
+// Resizes an image client-side before upload, so we're not sending huge
+// phone-camera files through the function (and Airtable's attachment API).
+function resizeImageToDataUrl(file, maxDim) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Photo upload modal
+const photoOverlay = document.getElementById('photoOverlay');
+const photoForm = document.getElementById('photoForm');
+const photoSiteName = document.getElementById('photoSiteName');
+const photoCancelBtn = document.getElementById('photoCancelBtn');
+let photoSiteId = null;
+
+function openPhotoModal(siteId, siteName) {
+  photoSiteId = siteId;
+  photoSiteName.textContent = siteName ? `For: ${siteName}` : '';
+  photoOverlay.classList.add('open');
+}
+
+function closePhotoModal() {
+  photoOverlay.classList.remove('open');
+  photoForm.reset();
+  photoSiteId = null;
+}
+
+photoCancelBtn.onclick = closePhotoModal;
+photoOverlay.addEventListener('click', (e) => { if (e.target === photoOverlay) closePhotoModal(); });
+
+photoForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fileInput = document.getElementById('f-photo');
+  const file = fileInput.files[0];
+  if (!file) {
+    showToast('Choose a photo first');
+    return;
+  }
+  if (!photoSiteId) {
+    showToast('Something went wrong, please close and try again');
+    return;
+  }
+
+  try {
+    const dataUrl = await resizeImageToDataUrl(file, 1400);
+    const base64 = dataUrl.split(',')[1];
+    const res = await fetch('/.netlify/functions/photos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        siteId: photoSiteId,
+        imageBase64: base64,
+        contentType: 'image/jpeg',
+        filename: 'photo.jpg',
+        submitter: document.getElementById('f-photo-submitter').value.trim()
+      })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      showToast('Could not upload: ' + text.slice(0, 100));
+      return;
+    }
+    closePhotoModal();
+    showToast('Thanks, photo sent for review');
+  } catch (err) {
+    showToast('Could not upload photo, check your connection');
+  }
+});
 
 // Modal controls
 const overlay = document.getElementById('overlay');
@@ -690,6 +870,7 @@ submitForm.addEventListener('submit', async (e) => {
     name: name,
     desc: desc,
     submitter: document.getElementById('f-submitter').value.trim(),
+    accessibility: document.getElementById('f-accessibility').value.trim(),
     lat: pickedLatLng.lat,
     lng: pickedLatLng.lng
   };
@@ -706,6 +887,7 @@ submitForm.addEventListener('submit', async (e) => {
 
 renderFilters();
 loadSubmissions();
+loadPhotos();
 </script>
 
 </body>
